@@ -1,12 +1,12 @@
 import os
 import time
-from visualizations import plot_delays_by_state, plot_reviews_vs_delays
 
 # Import our custom modules
 from config import get_spark_session, OUTPUT_DIR
 from loader import load_datasets
 from preprocessor import clean_orders_data, build_master_dataframe
 from analytics import engineer_delivery_features, analyze_delays_by_state, analyze_reviews_vs_delays
+from visualizations import plot_delays_by_state, plot_reviews_vs_delays
 
 def ensure_output_dirs_exist():
     # Creates the output directories if they don't exist.
@@ -50,6 +50,22 @@ def main():
     review_df = analyze_reviews_vs_delays(analytics_df, out_dir)
     review_df.show() # Print to console for demo video
     
+    # ... existing code ...
+    state_df = analyze_delays_by_state(analytics_df, out_dir)
+    state_df.show(5) 
+
+    review_df = analyze_reviews_vs_delays(analytics_df, out_dir)
+    review_df.show() 
+
+    # --- NEW CODE: GENERATE CHARTS ---
+    print("\n--- Generating Visualizations ---")
+    plot_delays_by_state(state_df, OUTPUT_DIR)
+    plot_reviews_vs_delays(review_df, OUTPUT_DIR)
+
+    # 5. Teardown
+    spark.stop()
+    # ... existing code ...
+
     # 5. Teardown
     spark.stop()
     
