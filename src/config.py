@@ -1,20 +1,26 @@
-"""SparkSession setup and project file paths."""
+from pyspark.sql import SparkSession
+import os
 
-from pathlib import Path
+# Define absolute paths based on the project structure
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA_DIR = os.path.join(BASE_DIR, "data", "raw")
+OUTPUT_DIR = os.path.join(BASE_DIR, "outputs")
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DATA_RAW = PROJECT_ROOT / "data" / "raw"
-DATA_PROCESSED = PROJECT_ROOT / "data" / "processed"
-OUTPUT_DATA = PROJECT_ROOT / "outputs" / "data"
-OUTPUT_VIZ = PROJECT_ROOT / "outputs" / "visualizations"
+# File paths for the specific Olist datasets
+ORDERS_PATH = os.path.join(DATA_DIR, "olist_orders_dataset.csv")
+CUSTOMERS_PATH = os.path.join(DATA_DIR, "olist_customers_dataset.csv")
+ITEMS_PATH = os.path.join(DATA_DIR, "olist_order_items_dataset.csv")
+REVIEWS_PATH = os.path.join(DATA_DIR, "olist_order_reviews_dataset.csv")
 
-
-def get_spark(app_name: str = "olist_pyspark_project"):
-    """Create and return a SparkSession."""
-    from pyspark.sql import SparkSession
-
-    return (
-        SparkSession.builder.appName(app_name)
-        .master("local[*]")
+def get_spark_session(app_name="Olist_Logistics_Analytics"):
+    # Creates and returns a PySpark session.
+    print("Initializing Spark Session...")
+    spark = SparkSession.builder \
+        .appName(app_name) \
+        .config("spark.sql.shuffle.partitions", "50") \
         .getOrCreate()
-    )
+    
+    # Suppress excessive warning logs in the console
+    spark.sparkContext.setLogLevel("ERROR") 
+    
+    return spark
