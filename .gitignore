@@ -10,6 +10,3 @@ __pycache__/
 spark-warehouse/
 metastore_db/
 derby.log
-
-# Large Olist CSVs — remove these lines if you intend to commit raw data
-data/raw/*.csv
