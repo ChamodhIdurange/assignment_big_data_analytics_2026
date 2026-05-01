@@ -5,7 +5,6 @@ The main execution script that runs the entire PySpark pipeline (Analytics & ML)
 import os
 import time
 
-# Import our custom modules
 from config import get_spark_session, OUTPUT_DIR
 from loader import load_datasets
 from preprocessor import clean_orders_data, build_master_dataframe
@@ -14,7 +13,6 @@ from visualizations import plot_delays_by_state, plot_reviews_vs_delays
 from recommendation import train_collaborative_model, train_association_model
 
 def ensure_output_dirs_exist():
-    """Creates the output directories if they don't exist."""
     data_out = os.path.join(OUTPUT_DIR, "data")
     if not os.path.exists(data_out):
         os.makedirs(data_out)
@@ -26,17 +24,14 @@ def main():
     print("Starting Olist Big Data Pipeline (Parts A & B)")
     print("==================================================")
     
-    # 0. Setup
     out_dir = ensure_output_dirs_exist()
     spark = get_spark_session()
     
-    # 1. Load Data
     datasets = load_datasets(spark)
     if not datasets:
         print("Pipeline aborted due to missing data.")
         return
 
-    # 2. Preprocess Data
     cleaned_orders = clean_orders_data(datasets["orders"])
     master_df = build_master_dataframe(
         cleaned_orders, 
@@ -48,32 +43,29 @@ def main():
     # ---------------------------------------------------------
     # PART A: ANALYTICS
     # ---------------------------------------------------------
-    # 3. Analytics & Feature Engineering
     analytics_df = engineer_delivery_features(master_df)
+    analytics_df.cache() 
     
-    # Cache the dataframe since we are using it for multiple aggregations
-    analytics_df.cache()
-    
-    # 4. Generate Insights
     state_df = analyze_delays_by_state(analytics_df, out_dir)
-    state_df.show(5) # Print top 5 to console for the demo video
+    state_df.show(5) 
     
     review_df = analyze_reviews_vs_delays(analytics_df, out_dir)
-    review_df.show() # Print to console for demo video
+    review_df.show() 
     
     print("\n--- Generating Visualizations ---")
-    # Remember: You must close the chart pop-ups for the script to continue!
     plot_delays_by_state(state_df, OUTPUT_DIR)
     plot_reviews_vs_delays(review_df, OUTPUT_DIR)
 
+    # ---------------------------------------------------------
     # PART B: RECOMMENDATION SYSTEMS
+    # ---------------------------------------------------------
     # 1. Collaborative Filtering (ALS)
     train_collaborative_model(master_df, OUTPUT_DIR)
     
-    # 2. Association Rules (FP-Growth) - uses only the raw items table
-    train_association_model(datasets["items"], OUTPUT_DIR)
+    # 2. Association Rules (FP-Growth) - NOW USING CATEGORIES
+    # --- NEW: Passing datasets["products"] ---
+    train_association_model(datasets["items"], datasets["products"], OUTPUT_DIR)
     
-    # 5. Teardown (Must happen ONLY ONCE at the very end of the script)
     spark.stop()
     
     end_time = time.time()
