@@ -1,8 +1,3 @@
-"""
-loader.py
-Functions to load raw CSV data into PySpark DataFrames.
-"""
-# --- NEW: Imported PRODUCTS_PATH ---
 from config import ORDERS_PATH, CUSTOMERS_PATH, ITEMS_PATH, REVIEWS_PATH, PRODUCTS_PATH
 
 def load_datasets(spark):

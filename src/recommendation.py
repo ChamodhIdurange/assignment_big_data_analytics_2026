@@ -1,7 +1,4 @@
-"""
-recommendation.py
-Contains Spark MLlib models for Collaborative Filtering (ALS) and Category Association Rules (FP-Growth).
-"""
+
 import os
 from pyspark.ml.recommendation import ALS
 from pyspark.ml.fpm import FPGrowth

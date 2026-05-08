@@ -1,7 +1,3 @@
-"""
-main.py
-The main execution script that runs the entire PySpark pipeline (Analytics & ML).
-"""
 import os
 import time
 
