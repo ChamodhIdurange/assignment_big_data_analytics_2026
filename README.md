@@ -1,27 +1,45 @@
-# Olist Big Data Analytics Pipeline (Part A)
+# E-Commerce Big Data Analytics & Hybrid Recommendation System
 
-## Overview
-This project analyzes the Brazilian E-Commerce Public Dataset by Olist using Apache Spark (PySpark). The objective of this analytics pipeline is to determine how delivery logistics (specifically delivery delays) impact customer satisfaction (review scores) across different Brazilian states.
+## Project Overview
 
-## Prerequisites
-To run this pipeline, you must have Python installed along with the following libraries:
-- `pyspark`
-- `pandas`
-- `matplotlib`
-- `seaborn`
+This project is an end-to-end Big Data analytics and machine learning pipeline built with Apache Spark (PySpark) and Python. It processes over 100,000 e-commerce orders to solve two core business challenges:
 
-You can install these dependencies by running: 
-`pip install pyspark pandas matplotlib seaborn`
+1. Part A (Analytics): Identifying regional logistics bottlenecks and mathematically proving how delivery speed drives customer satisfaction.
+2. Part B (Recommendation System): Building a hybrid machine learning engine capable of both personalized user-to-item targeting (Collaborative Filtering) and real-time category cross-selling (Market Basket Analysis).
 
-## Project Structure
-- `data/raw/`: Place the 4 required Olist CSV files here (`olist_orders_dataset.csv`, `olist_customers_dataset.csv`, `olist_order_items_dataset.csv`, `olist_order_reviews_dataset.csv`).
-- `src/`: Contains all modular PySpark scripts (`config.py`, `loader.py`, `preprocessor.py`, `analytics.py`, `visualizations.py`, `main.py`).
-- `outputs/`: The script will automatically generate CSV summaries and PNG charts in this folder.
+## Dataset Information
 
-## Execution Instructions
-1. Ensure the Olist CSV files are placed in the `data/raw/` directory.
-2. Open your terminal and navigate to the root directory of this project.
-3. Run the main pipeline script using the following command:
-   `python src/main.py`
-4. The script will execute the PySpark data engineering pipeline and display interactive charts on your screen. **You must close the first chart window for the script to continue to the second chart.**
-5. Final summary CSVs and high-resolution chart images will be saved automatically in the `outputs/` folder.
+Data Source: This project utilizes an outsourced, real-world commercial dataset.
+
+- Name: Brazilian E-Commerce Public Dataset by Olist
+- Provider: Kaggle
+- Link: [Download the Dataset Here](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+
+_Note: You must download the CSV files from the link above and place them in the `data/raw/` directory before running the pipeline._
+_In old Pandas, people often save intermediate CSVs at every step. Because I built this in PySpark, the Master DataFrame is kept in-memory and cached. This will speed up the pipeline_
+
+## 🛠️ Technical Architecture & Data Engineering
+
+Building this pipeline required handling messy, real-world data across 5 distinct relational databases (Orders, Customers, Items, Reviews, Products).
+
+- CSV Parsing Fixes: Addressed severe data corruption caused by carriage returns in customer text reviews by configuring the PySpark reader with `multiLine=True` and `escape='"'`.
+- Data Sanitization: Utilized Regex filtering (`rlike("^[1-5]$")`) to isolate valid review scores before casting string IDs to numeric Integer types.
+- Complex Joins: Executed high-performance Inner and Left Joins across all datasets to construct a unified Master DataFrame for analytics.
+- Feature Engineering: Built a custom metric, `avg_delay_days`, by calculating the `datediff` between actual and estimated delivery timestamps.
+
+## Technologies Used
+
+- Apache Spark / PySpark (Distributed Data Processing & SQL)
+- Spark MLlib (ALS & FP-Growth Machine Learning)
+- Python (Core Programming)
+- Pandas (Data Output & Formatting)
+- Matplotlib & Seaborn (Data Visualization)
+
+# How to Run the Project
+
+1. Clone the repository.
+2. Download the Olist dataset from the Kaggle link provided above and place the CSVs inside `data/raw/`.
+3. Ensure your Python environment has PySpark installed (`pip install pyspark pandas matplotlib seaborn`).
+4. Execute the main pipeline script: (`python3 src/main.py`)
+
+   python src/main.py
